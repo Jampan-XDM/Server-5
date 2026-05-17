@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAMPAN XMD | Server 5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #0f172a; color: white; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 2.5rem; padding: 2.5rem; width: 100%; max-width: 400px; text-align: center; }
+        .btn-cyan { background: linear-gradient(90deg, #00f2ff, #0072ff); transition: 0.3s; }
+        .btn-cyan:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(0, 242, 255, 0.4); }
+        #pair-code { letter-spacing: 4px; font-weight: 900; color: #00f2ff; cursor: pointer; }
+        .instruction-box { background: rgba(0,0,0,0.2); border-radius: 1rem; padding: 15px; margin-top: 20px; text-align: left; font-size: 11px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+
+    <div class="glass shadow-2xl">
+        <div class="mb-4"><span class="bg-cyan-500/10 text-cyan-400 text-[10px] px-4 py-1 rounded-full font-bold tracking-widest uppercase">Server 05</span></div>
+        <h1 class="text-3xl font-black italic tracking-tighter mb-10">JAMPAN <span class="text-cyan-400">XMD</span></h1>
+
+        <div id="input-area">
+            <input type="number" id="number" placeholder="255674229015" class="w-full p-4 rounded-2xl bg-slate-900/50 border border-slate-700 text-center text-lg mb-4 outline-none focus:border-cyan-500 text-white">
+            <button onclick="getCode()" id="submit-btn" class="w-full py-4 rounded-2xl btn-cyan font-bold uppercase tracking-widest text-sm">Get Pairing Code</button>
+        </div>
+
+        <div id="result-area" class="hidden">
+            <p class="text-[10px] text-gray-500 uppercase mb-2">Tap to copy code</p>
+            <div id="pair-code" onclick="copyCode()" class="text-4xl bg-black/40 p-6 rounded-2xl border border-dashed border-cyan-500/50">--------</div>
+
+            <div class="instruction-box">
+                <p class="mb-2 uppercase font-bold text-white text-[9px]">How to use:</p>
+                <p>1. Open WhatsApp > Settings</p>
+                <p>2. Tap Linked Devices > Link a Device</p>
+                <p>3. Select "Link with phone number instead"</p>
+                <p>4. Enter the code above</p>
+            </div>
+
+            <button onclick="location.reload()" class="w-full mt-6 py-3 rounded-xl bg-slate-800 text-[10px] uppercase font-bold tracking-widest hover:bg-slate-700">Pair New Session</button>
+        </div>
+
+        <div id="loading" class="hidden mt-6 animate-pulse text-cyan-400 font-bold text-xs uppercase text-center">
+            <i class="fas fa-spinner fa-spin mb-2 text-lg"></i><br>
+            Connecting to Server...
+        </div>
+
+        <p class="mt-10 text-[8px] text-gray-600 uppercase tracking-[10px]">By Kelvin Jampan</p>
+    </div>
+
+    <script>
+        async function getCode() {
+            const num = document.getElementById('number').value;
+            if (!num) return alert("Weka namba!");
+
+            // Ficha input na onyesha loading
+            document.getElementById('input-area').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+
+            try {
+                // MUHIMU: Tunatumia /pair kulingana na kodi ya index.js tuliyorekebisha
+                const res = await fetch(`/pair?number=${num}`);
+                const data = await res.json();
+
+                if (data.code) {
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('result-area').classList.remove('hidden');
+                    document.getElementById('pair-code').innerText = data.code;
+                } else { 
+                    alert(data.error || "Imefeli kutoa kodi. Jaribu tena."); 
+                    location.reload(); 
+                }
+            } catch (e) { 
+                alert("Server Error! Hakikisha bot imewaka vizuri Heroku."); 
+                location.reload(); 
+            }
+        }
+
+        function copyCode() {
+            const code = document.getElementById('pair-code').innerText;
+            if (code === "--------") return;
+
+            navigator.clipboard.writeText(code).then(() => {
+                alert("Code Copied: " + code);
+            }).catch(err => {
+                // Fallback kwa simu zingine
+                const textArea = document.createElement("textarea");
+                textArea.value = code;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert("Code Copied: " + code);
+            });
+        }
+    </script>
+</body>
+</html>
