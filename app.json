@@ -1,0 +1,11 @@
+{
+  "name": "JAMPAN XMD",
+  "description": "WhatsApp Bot using Baileys with Pairing Code",
+  "repository": "https://github.com/Jampan-XDM/JAMPAN-XMD-2",
+  "keywords": ["whatsapp", "bot", "baileys", "pairing"],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}
